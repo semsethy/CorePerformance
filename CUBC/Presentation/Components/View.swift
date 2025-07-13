@@ -13,6 +13,5 @@ extension View {
             .foregroundColor(.gray)
             .font(.headline)
             .frame(maxWidth: .infinity, alignment: .leading)
-//            .padding(.horizontal, 8)
     }
 }
