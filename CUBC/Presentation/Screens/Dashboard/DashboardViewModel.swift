@@ -7,12 +7,26 @@
 
 import SwiftUI
 
-struct DashboardViewModel: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+final class DashboardViewModel: ObservableObject {
+    @Published var showEye: Bool = false
+
+    struct ServiceItem: Identifiable {
+        let id = UUID()
+        let title: String
+        let icon: String
     }
+
+    let serviceItems: [ServiceItem] = [
+        .init(title: "Favorite", icon: "repeat.circle"),
+        .init(title: "Fixed Deposit", icon: "repeat.circle"),
+        .init(title: "Top-up History", icon: "repeat.circle"),
+        .init(title: "Loans", icon: "repeat.circle"),
+        .init(title: "Future Schedule", icon: "repeat.circle"),
+        .init(title: "FX Rates", icon: "repeat.circle")
+    ]
 }
 
-#Preview {
-    DashboardViewModel()
-}
+
+//#Preview {
+//    DashboardViewModel()
+//}
