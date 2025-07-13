@@ -8,50 +8,38 @@
 import SwiftUI
 
 struct TabBar: View {
-    var action: () -> Void
-    
-    var body: some View {
-        ZStack {
-            // MARK: Arc Shape
-            Arc()
-                .fill(Color(UIColor(white: 1, alpha: 1)))
-                .frame(height: 78)
-                .overlay {
-                    HStack {
-                        // MARK: Expand Button
-                        Button {
-                            action()
-                        } label: {
-                            VStack(spacing: 5) {
-                                Image(systemName: "house")
-                                    .frame(width: 30, height: 30)
-                                Text("Home")
-                                    .font(.system(size: 13))
-                            }
-                        }
-                        
-                        Spacer()
-                        
-                        // MARK: Navigation Button
-                        NavigationLink {
+    @StateObject private var authenticator = Authenticator()
+    @Binding var selectedTab: Tab
+    @State private var qrIsShown: Bool = false
+    @State private var showFailureAlert = false
 
-                        } label: {
-                            VStack(spacing: 5) {
-                                Image(systemName: "list.star")
-                                    .frame(width: 30, height: 30)
-                                Text("Payment")
-                                    .font(.system(size: 13))
-                            }
-                        }
-                    }
-                    .font(.title2)
-                    .foregroundColor(Color(UIColor(white: 0.5, alpha: 1)))
-                    .padding(EdgeInsets(top: 20, leading: 70, bottom: 55, trailing: 70))
-                }
-                .shadow(radius: 10)
-            
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            Arc()
+                .fill(Color(UIColor(white: 0.95, alpha: 1)))
+                .frame(height: 90)
+                .shadow(radius: 6)
+                .offset(y: 15)
+
+            HStack {
+                Spacer()
+                tabButton(icon: "house", label: "Home", tab: .home)
+                Spacer()
+                Spacer()
+                tabButton(icon: "list.star", label: "Payment", tab: .payment)
+                Spacer()
+            }
+            .offset(y: -20)
+
             Button {
                 
+                authenticator.authenticate { success in
+                    if success {
+                        qrIsShown = true
+                    } else {
+                        showFailureAlert = true
+                    }
+                }
             } label: {
                 Image(systemName: "qrcode.viewfinder")
                     .font(.system(size: 30))
@@ -59,23 +47,38 @@ struct TabBar: View {
                     .frame(width: 74, height: 74)
                     .background(Color.green)
                     .clipShape(Circle())
+                    .overlay(Circle().stroke(Color.white, lineWidth: 4))
                     .shadow(radius: 4)
-                    .overlay {
-                        Circle().stroke(Color.white, lineWidth: 4)
-                    }
             }
             .offset(y: -55)
+            .buttonStyle(NoHighlightButtonStyle())
         }
-        .frame(maxHeight: .infinity, alignment: .bottom)
-        .ignoresSafeArea()
+        .frame(maxWidth: .infinity)
+        .frame(height: 90)
+        .ignoresSafeArea(edges: .bottom)
+        .fullScreenCover(isPresented: $qrIsShown) {
+            QrCodeScreen()
+        }
+        .alert("Authentication Failed", isPresented: $showFailureAlert) {
+            Button("OK", role: .cancel) { }
+        }
+    }
+
+    private func tabButton(icon: String, label: String, tab: Tab) -> some View {
+        Button {
+            selectedTab = tab
+        } label: {
+            VStack(spacing: 5) {
+                Image(systemName: icon)
+                Text(label)
+            }
+            .foregroundColor(selectedTab == tab ? .blue : .gray)
+        }
     }
 }
 
-struct TabBar_Previews: PreviewProvider {
-    static var previews: some View {
-        TabBar(action: {})
-            .preferredColorScheme(.dark)
-    }
-}
 
+#Preview {
+    TabBar(selectedTab: .constant(.home))
+}
 

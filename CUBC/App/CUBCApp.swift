@@ -11,7 +11,7 @@ import SwiftUI
 struct CUBCApp: App {
     var body: some Scene {
         WindowGroup {
-            DashboardView()
+            CustomTabMainView()
         }
     }
 }
